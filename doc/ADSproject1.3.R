@@ -1,0 +1,59 @@
+Needed <- c("tm", "SnowballCC", "RColorBrewer", "ggplot2", "wordcloud", "biclust", "cluster", "igraph", "fpc")   
+Needed <- c("tm", "SnowballCC", "RColorBrewer", "ggplot2", "wordcloud", "biclust", "cluster", "igraph", "fpc","stopwords")   
+install.packages(Needed, dependencies=TRUE) 
+install.packages("Rcampdf", repos = "http://datacube.wu.ac.at/", type = "source")
+
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(dplyr)
+library(SnowballC) 
+library(readxl)
+library(ggplot2)
+library(biclust)
+library(cluster)
+library(igraph)
+library(fpc)
+library(Rcampdf)
+library(stopwords)
+##setwd("/Users/apple/Documents/R")
+
+folder.path <- "/Users/apple/Documents/R/InauguralSpeeches"
+
+speeches <- Corpus(DirSource(folder.path)) 
+##summary(speeches)
+
+speech <- tm_map(speeches, tolower)
+speech <- tm_map(speech, removeWords, stopwords("english"))
+speech <- tm_map(speech, removePunctuation)
+speech <- tm_map(speech, removeNumbers)
+speech <- tm_map(speech, stripWhitespace)
+
+speech <- tm_map(speech, stemDocument)
+speech <- tm_map(speech, removeWords, c("will","can","always","among","come", "even","ever","every","just","let","years","day","well", "whose"))
+speech <- tm_map(speech, removeWords, c("take", "things","see","others","part", "must","may","might","less","one","shall","see","toward","never","need"))
+speech <- tm_map(speech, removeWords, c("find", "made","make","long","part", "now","means","many","yet","within","without","upon"))
+speech <- tm_map(speech, PlainTextDocument)   
+##inspect(speech[1])
+
+dtm <- DocumentTermMatrix(speech)
+inspect(dtm.all[1:5, 1:20])
+freq <- colSums(as.matrix(dtm))   
+length(freq)
+ord <- order(freq)
+freq[tail(ord)]
+
+m <- as.matrix(dtm)   
+dim(m)   
+write.csv(m, file="dtm.csv") 
+
+findFreqTerms(dtm, lowfreq=50)
+
+mydata1<-read.csv("dtm.csv",header = TRUE)
+mydata2<-read.table("/Users/apple/Documents/R/Spr2017-Proj1-henryzyguo/data/InauguationDates.txt", header=TRUE, sep="", fill=TRUE, row.names=NULL,comment.char = "")
+mydata3<-read_excel("/Users/apple/Documents/R/Spr2017-Proj1-henryzyguo/data/InaugurationInfo.xlsx",sheet=1,col_names=TRUE,col_types=NULL)
+fulldata<-merge(mydata2,mydata3)
+
+strsplit
+
